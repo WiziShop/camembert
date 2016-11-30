@@ -10,7 +10,7 @@ import {
 
 import G = require("glob");
 
-import {Environment} from "./environment.interface";
+import {CamembertEnvironment} from "./interfaces/camembert-environment.interface";
 import {CamembertControllerMetadataKey, CamembertController} from "./decorators/camembert-controller.decorator";
 import {CamembertRouteConfig} from "./decorators/camembert-route.decorator";
 
@@ -38,7 +38,7 @@ export class Camembert {
 
   private app: express.Application;
 
-  private constructor(private environment: Environment,
+  private constructor(private environment: CamembertEnvironment,
                       run?: (app: express.Application, routes: CamembertRoute[], container: Container)=>void) {
 
     this.importControllers();
@@ -55,7 +55,7 @@ export class Camembert {
 
   }
 
-  static configure(environment: Environment,
+  static configure(environment: CamembertEnvironment,
                    run?: (app: express.Application, routes: CamembertRoute[], container: Container)=>void): Camembert {
 
     return new this(environment, run);

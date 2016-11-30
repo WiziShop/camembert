@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { Container } from "inversify";
 import * as express from "express";
 import * as http from 'http';
-import { Environment } from "./environment.interface";
+import { CamembertEnvironment } from "./interfaces/camembert-environment.interface";
 export interface CamembertRoute {
     controllerInstance: Function;
     path: string;
@@ -22,7 +22,7 @@ export declare class Camembert {
     private container;
     private app;
     private constructor(environment, run?);
-    static configure(environment: Environment, run?: (app: express.Application, routes: CamembertRoute[], container: Container) => void): Camembert;
+    static configure(environment: CamembertEnvironment, run?: (app: express.Application, routes: CamembertRoute[], container: Container) => void): Camembert;
     start(onListening?: (server: http.Server) => void, onError?: (server: http.Server, error: any) => void): void;
     private importControllers();
     private setContainer();
