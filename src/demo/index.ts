@@ -9,6 +9,9 @@ import {Camembert, CamembertRoute} from "../app/camembert";
 import {CamembertRouteMiddleware} from "../app/middlewares/camembert-route.middleware";
 
 
+/**
+ * @Internal()
+ */
 Camembert.configure(environment, (app: express.Application, routes: CamembertRoute[], container: Container) => {
 
   //My middleware

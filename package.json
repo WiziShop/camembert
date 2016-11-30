@@ -1,20 +1,21 @@
 {
   "name": "Camembert",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Camembert framwork",
   "author": "",
   "license": "ISC",
-  "main": "dist/demo/index.js",
+  "main": "lib/app/camembert.js",
+  "typings": "lib/app/camembert.d.ts",
   "scripts": {
     "nodemon:debug": "NODE_ENV=dev nodemon --debug=5858",
-    "watch": "npm run concurrently \"npm run tsc:w\" \"npm run nodemon:debug\"",
-    "start": " npm run build  &&  npm run watch",
+    "watch": "npm run concurrently \"npm run tsc:w\" \"npm run nodemon:debug lib/demo/index.js\"",
+    "start:demo": " npm run build  &&  npm run watch",
     "concurrently": "concurrently",
     "test": "NODE_ENV=test jasmine",
     "tsc": "tsc -p ./src",
     "tsc:w": "tsc -p ./src -w",
-    "build": "rm -rf dist && npm run tsc",
-    "jasmine": "jasmine"
+    "build": "rm -rf lib && npm run tsc",
+    "generate:dts": "rm -Rf dts && tsc -p ./src -d --declarationDir dts && rm -Rf dts/demo"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
