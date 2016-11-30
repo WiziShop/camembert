@@ -1,11 +1,11 @@
 {
   "name": "camembert",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A Camembert framwork",
   "author": "",
   "license": "ISC",
   "main": "lib/app/camembert.js",
-  "typings": "lib/app/camembert.d.ts",
+  "typings": "dts/app/camembert.d.ts",
   "scripts": {
     "nodemon:debug": "NODE_ENV=dev nodemon --debug=5858",
     "watch": "npm run concurrently \"npm run tsc:w\" \"npm run nodemon:debug lib/demo/index.js\"",
