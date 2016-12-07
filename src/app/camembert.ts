@@ -12,14 +12,15 @@ import G = require("glob");
 
 import {CamembertEnvironment} from "./interfaces/camembert-environment.interface";
 import {CamembertControllerMetadataKey, CamembertController} from "./decorators/camembert-controller.decorator";
-import {CamembertRouteConfig} from "./decorators/camembert-route.decorator";
+import {CamembertRouteConfig, CamembertRouteKey} from "./decorators/camembert-route.decorator";
+import {CamembertRouteMiddleware} from "./middlewares/camembert-route.middleware";
+import {CamembertFormKey} from "./decorators/camembert-form.decorator";
 
-export interface CamembertRoute {
-  controllerInstance: Function;
+
+export interface CamembertRouting {
   path: string;
   httpMethod: string;
-  middleware: Function;
-  data: any;
+  middleware: Function[];
 }
 
 
@@ -28,18 +29,31 @@ export interface CamembertRouteRouteParameter {
   type: any;
 }
 
+export class CamembertContainer extends Container {
 
+}
+
+/**
+ * The Camembert core class
+ */
 export class Camembert {
   private started = false;
 
-  private routes: CamembertRoute[] = [];
+  private routes: CamembertRouting[] = [];
 
-  private container: Container;
+  private container: CamembertContainer;
 
   private app: express.Application;
 
+  private routeConfigs: CamembertRouteConfig[] = [];
+
+  /**
+   *
+   * @param environment
+   * @param run
+   */
   private constructor(private environment: CamembertEnvironment,
-                      run?: (app: express.Application, routes: CamembertRoute[], container: Container)=>void) {
+                      run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer)=>void) {
 
     this.importControllers();
 
@@ -55,12 +69,25 @@ export class Camembert {
 
   }
 
+  /**
+   * Configure Camembert before start the serve
+   *
+   * @param environment The Camembert's configuration
+   * @param run Function which will be executed to allow you to configure the app the way you want before start the server
+   * @returns {Camembert}
+   */
   static configure(environment: CamembertEnvironment,
-                   run?: (app: express.Application, routes: CamembertRoute[], container: Container)=>void): Camembert {
+                   run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer)=>void): Camembert {
 
     return new this(environment, run);
   }
 
+  /**
+   * Start the server
+   *
+   * @param onListening Function to execute on the "listening" HTTP server event. If none a default function will be executed
+   * @param onError Function to execute on the "error" HTTP server event. If none a default function will be executed
+   */
   start(onListening?: (server: http.Server)=>void, onError?: (server: http.Server, error: any)=>void) {
     if (this.started) {
       throw 'Server already started';
@@ -91,6 +118,9 @@ export class Camembert {
     });
   }
 
+  /**
+   * Import the controllers to the app
+   */
   private importControllers() {
 
     this.environment.controllersPath.forEach(controllerPath => {
@@ -103,10 +133,14 @@ export class Camembert {
   }
 
 
+  /**
+   * Create the DI container
+   *
+   */
   private setContainer() {
-    this.container = new Container();
+    this.container = new CamembertContainer();
 
-    this.container.bind(this.container.constructor).toSelf().inSingletonScope();
+    this.container.bind(CamembertContainer).toConstantValue(this.container);
 
     let targets = Reflect.getMetadata(CamembertInjectableMetadataKey, CamembertInjectable);
     targets.forEach(target => {
@@ -114,7 +148,9 @@ export class Camembert {
     });
   }
 
-
+  /**
+   * Set routing
+   */
   private setRouting() {
     let controllers = Reflect.getMetadata(CamembertControllerMetadataKey, CamembertController);
 
@@ -124,41 +160,88 @@ export class Camembert {
     });
   }
 
+
+  /**
+   * Retrieve all routes for a controller and populate the routes array
+   *
+   * @param controller
+   */
   private extractRoutesFromCamembertController(controller: Function) {
+
 
     for (let actionName of Object.getOwnPropertyNames(controller.prototype)) {
       let action = controller.prototype[actionName];
 
-      if (typeof action !== 'function' || !Reflect.hasMetadata('routes', action)) {
+      if (typeof action !== 'function') {
         continue;
       }
 
-      let routes = Reflect.getMetadata('routes', action);
+      let route: CamembertRouteConfig = Reflect.getMetadata(CamembertRouteKey, action);
 
-      routes.forEach((route: CamembertRouteConfig) => {
+      if (!route) {
+        continue;
+      }
 
-        let camembertRoute: CamembertRoute = {
-          controllerInstance: this.container.get(route.controller.constructor),
-          path: (Reflect.getMetadata(CamembertControllerMetadataKey, controller) || "") + route.path,
-          httpMethod: route.httpMethod,
-          middleware: route.middleware,
-          data: route.data,
-        };
+      route.path = (Reflect.getMetadata(CamembertControllerMetadataKey, controller) || "") + route.path;
+
+      this.routeConfigs.push(route);
+
+      let controllerInstance = this.container.get(route.controller.constructor);
+
+      let routeParams = CamembertUtils.getRouteParameters(controllerInstance, route.action);
 
 
-        this.routes.push(camembertRoute);
+      let middleware: Function[] = route.beforeMiddleware ? route.beforeMiddleware : [];
 
+      for (let routerParam of routeParams) {
+        if (typeof routerParam.type === 'function') {
+
+          let formValidator = Reflect.getMetadata(CamembertFormKey, routerParam.type);
+
+          if (formValidator) {
+
+            middleware.push((req, res, next) => {
+
+              let formInst = new routerParam.type();
+
+              for (let property of Object.keys(formInst)) {
+                if (req.body.hasOwnProperty(property)) {
+                  formInst[property] = req.body[property];
+                }
+              }
+              formValidator(req, res, next, formInst);
+            });
+          }
+        }
+      }
+
+
+      middleware.push(CamembertRouteMiddleware(controllerInstance, route.action, routeParams));
+
+      route.afterMiddleware.forEach(m => {
+        middleware.push(m);
       });
+
+      this.routes.push(
+        {
+          path: route.path,
+          httpMethod: route.httpMethod,
+          middleware: middleware,
+        }
+      );
     }
   }
 
-
+  /**
+   * Event listener for HTTP server "error" event
+   *
+   * @param error
+   */
   private onError(error: any) {
     if (error.syscall !== 'listen') {
       throw error;
     }
 
-    // handle specific listen errors with friendly messages
     switch (error.code) {
       case 'EACCES':
         console.error(`Port ${this.environment.port} requires elevated privileges`);
@@ -188,10 +271,16 @@ export class Camembert {
   }
 
 
-  private dumpRoutes(app) {
+  /**
+   * Dump the routes into the console
+   *
+   * @param app
+   */
+  private dumpRoutes(app: express.Application) {
     let ignoredRoutes = ['query', 'expressInit'];
 
-    console.log('------ ROUTES ------');
+
+    console.log(`------ ROUTES ------`);
     app._router.stack.forEach(entry => {
 
       if (entry.route) {
@@ -203,15 +292,17 @@ export class Camembert {
           .map((method) => {
             let r = method.toUpperCase() + ' ' + route.path;
 
-
-            this.routes.forEach((route: CamembertRoute) => {
+            this.routeConfigs.forEach((route: CamembertRouteConfig) => {
               let paramNames: string[] = [];
-              let routeParams = CamembertUtils.getRouteParameters(route);
+              let controllerInstance = this.container.get(route.controller.constructor);
+              let routeParams = CamembertUtils.getRouteParameters(controllerInstance, route.action);
               for (let param of routeParams) {
                 paramNames.push(param.name + ':' + param.type.name);
               }
+
+
               if (r === route.httpMethod.toUpperCase() + ' ' + route.path) {
-                r += ' → ' + route.controllerInstance.constructor.name + '::' + route.middleware.name + '(' + paramNames.join(', ') + ')';
+                r += ' → ' + route.controller.constructor.name + '::' + route.action.name + '(' + paramNames.join(', ') + ')';
               }
             });
 
@@ -219,14 +310,26 @@ export class Camembert {
           })
       }
     });
+
+    console.log(`------ ${this.routeConfigs.length} routes found ------`);
   }
 
 }
 
 
+/**
+ * CamembertUtils class
+ */
 export class CamembertUtils {
 
-  static getRouteParameters(route: CamembertRoute): CamembertRouteRouteParameter[] {
+  /**
+   * Retrieve route parameters
+   *
+   * @param ControllerInstance
+   * @param method
+   * @returns {CamembertRouteRouteParameter[]}
+   */
+  static getRouteParameters(ControllerInstance, method): CamembertRouteRouteParameter[] {
 
     let routeParams: CamembertRouteRouteParameter[] = [];
 
@@ -241,8 +344,8 @@ export class CamembertUtils {
       return result;
     }
 
-    let parameters = getParamNames(route.middleware);
-    let parameterTypes = Reflect.getMetadata('design:paramtypes', route.controllerInstance, route.middleware.name);
+    let parameters = getParamNames(method);
+    let parameterTypes = Reflect.getMetadata('design:paramtypes', ControllerInstance, method.name);
 
     parameters.forEach((parameter, i) => {
       if (parameterTypes.hasOwnProperty(i)) {

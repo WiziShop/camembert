@@ -4,6 +4,13 @@ import {injectable} from 'inversify';
 
 export const CamembertInjectableMetadataKey = Symbol('CamembertInjectable');
 
+/**
+ * Camembert injectable decorator
+ *
+ * Use this decorator with all non controllers classes you want to be injectable
+ * @returns {(target:Object)=>undefined}
+ * @constructor
+ */
 export function CamembertInjectable() {
   return function (target: Object) {
 

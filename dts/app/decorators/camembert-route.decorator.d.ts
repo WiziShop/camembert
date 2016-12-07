@@ -1,10 +1,11 @@
 import "reflect-metadata";
-export declare const CamembertRoutesKey: string;
+export declare const CamembertRouteKey: symbol;
 export interface CamembertRouteConfig {
     controller: Object;
     path: string;
     httpMethod: string;
-    middleware: Function;
-    data: any;
+    action: Function;
+    beforeMiddleware: Function[];
+    afterMiddleware: Function[];
 }
-export declare function CamembertRoute(method: string, path?: string, data?: any): (target: Object, propertyKey: string) => void;
+export declare function CamembertRoute(httpMethod: string, path?: string, beforeMiddleware?: [(req, res, next) => void], afterMiddleware?: [(req, res, next) => void]): (target: Object, propertyKey: string) => void;

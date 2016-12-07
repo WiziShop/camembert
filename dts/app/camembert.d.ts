@@ -4,16 +4,16 @@ import { Container } from "inversify";
 import * as express from "express";
 import * as http from 'http';
 import { CamembertEnvironment } from "./interfaces/camembert-environment.interface";
-export interface CamembertRoute {
-    controllerInstance: Function;
+export interface CamembertRouting {
     path: string;
     httpMethod: string;
-    middleware: Function;
-    data: any;
+    middleware: Function[];
 }
 export interface CamembertRouteRouteParameter {
     name: string;
     type: any;
+}
+export declare class CamembertContainer extends Container {
 }
 export declare class Camembert {
     private environment;
@@ -21,8 +21,9 @@ export declare class Camembert {
     private routes;
     private container;
     private app;
+    private routeConfigs;
     private constructor(environment, run?);
-    static configure(environment: CamembertEnvironment, run?: (app: express.Application, routes: CamembertRoute[], container: Container) => void): Camembert;
+    static configure(environment: CamembertEnvironment, run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer) => void): Camembert;
     start(onListening?: (server: http.Server) => void, onError?: (server: http.Server, error: any) => void): void;
     private importControllers();
     private setContainer();
@@ -33,5 +34,5 @@ export declare class Camembert {
     private dumpRoutes(app);
 }
 export declare class CamembertUtils {
-    static getRouteParameters(route: CamembertRoute): CamembertRouteRouteParameter[];
+    static getRouteParameters(ControllerInstance: any, method: any): CamembertRouteRouteParameter[];
 }

@@ -3,18 +3,13 @@ import * as express from "express";
 import morgan = require("morgan");
 import helmet = require("helmet");
 import bodyParser = require("body-parser");
-import {Container} from "inversify";
 let inflector = require("json-inflector");
-import {Camembert, CamembertRoute} from "../app/camembert";
-import {CamembertRouteMiddleware} from "../app/middlewares/camembert-route.middleware";
+import {Camembert, CamembertRouting, CamembertContainer} from "../app/camembert";
 
 
-/**
- * @Internal()
- */
-Camembert.configure(environment, (app: express.Application, routes: CamembertRoute[], container: Container) => {
+Camembert.configure(environment, (app: express.Application, routes: CamembertRouting[], container: CamembertContainer) => {
 
-  //My middleware
+  //Register you own middleware here
   app.use(morgan('combined'));
 
   app.use(helmet());
@@ -26,14 +21,10 @@ Camembert.configure(environment, (app: express.Application, routes: CamembertRou
     response: 'underscore'
   }));
 
-  //Register routes
-  routes.forEach((route) => {
-    app[route.httpMethod](route.path, CamembertRouteMiddleware(route).bind(route.controllerInstance));
-  });
 
-  //Route without camembert decorators
-  app.get('/not/camembert/:id', (req, res, next) => {
-    res.send('NOT CAMEMBERT');
-  })
+  //Register the routes
+  routes.forEach((route) => {
+    app[route.httpMethod](route.path, route.middleware);
+  });
 
 }).start();
