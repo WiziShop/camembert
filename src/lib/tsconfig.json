@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["es6", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "outDir": "../../lib/camembert",
+    "sourceMap": true,
+    "target": "es6",
+    "inlineSources": true,
+    "stripInternal": false,
+    "typeRoots": [
+      "../../node_modules/@types/!(node)"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "camembert",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "A light framwork to create simple backend with express and dependency injection",
   "keywords": [
     "express",
@@ -11,18 +11,19 @@
   ],
   "author": "WiziShop",
   "license": "ISC",
-  "main": "lib/app/index.js",
-  "typings": "dts/app/index.d.ts",
+  "main": "lib/camembert/index.js",
+  "typings": "lib/camembert/index.d.ts",
   "scripts": {
     "nodemon:debug": "NODE_ENV=dev nodemon --debug=5858",
-    "watch": "npm run concurrently \"npm run tsc:w\" \"npm run nodemon:debug lib/demo/index.js\"",
+    "watch": "npm run concurrently \"npm run tsc:lib:w\"  \"npm run tsc:demo:w\" \"npm run nodemon:debug dist/demo-app/index.js\"",
     "start:demo": " npm run build  &&  npm run watch",
     "concurrently": "concurrently",
     "test": "NODE_ENV=test jasmine",
-    "tsc": "tsc -p ./src",
-    "tsc:w": "tsc -p ./src -w",
-    "build": "rm -rf lib && npm run tsc",
-    "generate:dts": "rm -Rf dts && tsc -p ./src -d --declarationDir dts && rm -Rf dts/demo"
+    "tsc:demo": "tsc -p ./src/demo-app",
+    "tsc:demo:w": "tsc -p ./src/demo-app -w",
+    "tsc:lib": "tsc -p ./src/lib",
+    "tsc:lib:w": "tsc -p ./src/lib --outDir ./node_modules/camembert -w",
+    "build": "rm -rf lib && npm run tsc:lib"
   },
   "dependencies": {
     "express": "^4.14.0",
