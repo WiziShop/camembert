@@ -9,4 +9,9 @@ export interface CamembertEnvironment {
    * You can enter a pattern like: __dirname + '/controllers/** /*.js'
    */
   controllersPath: string[];
+
+  /**
+   * Adding a verbose value
+   */
+  verbose?: boolean;
 }

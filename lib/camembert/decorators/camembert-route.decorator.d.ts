@@ -1,5 +1,5 @@
 import "reflect-metadata";
-export declare const CamembertRouteKey: symbol;
+export declare const CamembertRouteKey: unique symbol;
 export interface CamembertRouteConfig {
     controller: Object;
     path: string;
@@ -15,9 +15,9 @@ export interface CamembertRouteConfig {
  *
  * @param httpMethod the http method i.e.: GET, POST, DELETE...
  * @param path The route path i.e.: /login
- * @param beforeMiddleware an array of middleware to execute before the method we are decorating
- * @param afterMiddleware an array of middleware to execute before the method we are decorating
+ * @param beforeMiddleware an array of middleware to execute before the method we are decorating - [(req, res, next)=>void]
+ * @param afterMiddleware an array of middleware to execute before the method we are decorating - [(req, res, next)=>void]
  * @returns {(target:Object, propertyKey:string)=>undefined}
  * @constructor
  */
-export declare function CamembertRoute(httpMethod: string, path?: string, beforeMiddleware?: [(req, res, next) => void], afterMiddleware?: [(req, res, next) => void]): (target: Object, propertyKey: string) => void;
+export declare function CamembertRoute(httpMethod: string, path?: string, beforeMiddleware?: Array<Function>, afterMiddleware?: Array<Function>): (target: Object, propertyKey: string) => void;

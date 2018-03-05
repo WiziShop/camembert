@@ -1,5 +1,5 @@
 import "reflect-metadata";
-export declare const CamembertFormKey: symbol;
+export declare const CamembertFormKey: unique symbol;
 /**
  * Camembert form decorator
  *

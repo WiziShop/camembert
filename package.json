@@ -1,6 +1,6 @@
 {
   "name": "camembert",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A light framwork to create simple backend with express and dependency injection",
   "keywords": [
     "express",
@@ -14,7 +14,7 @@
   "main": "lib/camembert/index.js",
   "typings": "lib/camembert/index.d.ts",
   "scripts": {
-    "nodemon:debug": "NODE_ENV=dev nodemon --debug=5858",
+    "nodemon:debug": "NODE_ENV=dev nodemon --inspect=5858",
     "watch": "npm run concurrently \"npm run tsc:lib:w\"  \"npm run tsc:demo:w\" \"npm run nodemon:debug dist/demo-app/index.js\"",
     "start:demo": " npm run build  &&  npm run watch",
     "concurrently": "concurrently",

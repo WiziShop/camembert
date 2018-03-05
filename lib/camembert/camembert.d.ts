@@ -30,7 +30,7 @@ export declare class Camembert {
      * @param environment
      * @param run
      */
-    private constructor(environment, run?);
+    private constructor();
     /**
      * Configure Camembert before start the serve
      *

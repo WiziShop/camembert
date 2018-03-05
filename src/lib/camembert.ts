@@ -279,8 +279,9 @@ export class Camembert {
   private dumpRoutes(app: express.Application) {
     let ignoredRoutes = ['query', 'expressInit'];
 
-
-    console.log(`------ ROUTES ------`);
+    if(this.environment.verbose !== false) {
+      console.log(`------ ROUTES ------`);
+    }
     app._router.stack.forEach(entry => {
 
       if (entry.route) {
@@ -306,12 +307,16 @@ export class Camembert {
               }
             });
 
-            console.log(r);
+            if(this.environment.verbose !== false) {
+              console.log(r);
+            }
           })
       }
     });
 
-    console.log(`------ ${this.routeConfigs.length} routes found ------`);
+    if(this.environment.verbose !== false) {
+      console.log(`------ ${this.routeConfigs.length} routes found ------`);
+    }
   }
 
 }

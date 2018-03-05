@@ -1,5 +1,5 @@
 import "reflect-metadata";
-export declare const CamembertControllerMetadataKey: symbol;
+export declare const CamembertControllerMetadataKey: unique symbol;
 /**
  * Camembert controller decorator
  *
