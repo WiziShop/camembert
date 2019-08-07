@@ -1,6 +1,6 @@
 {
   "name": "camembert",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "A light framwork to create simple backend with express and dependency injection",
   "keywords": [
     "express",
@@ -26,28 +26,28 @@
     "build": "rm -rf lib && npm run tsc:lib"
   },
   "dependencies": {
-    "express": "^4.14.0",
-    "glob": "^7.1.1",
-    "inversify": "^3.0.0-beta.3",
-    "reflect-metadata": "^0.1.8"
+    "express": "^4.17.1",
+    "glob": "^7.1.4",
+    "inversify": "^5.0.1",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@types/body-parser": "1.16.0",
-    "@types/express": "^4.0.34",
-    "@types/glob": "^5.0.30",
-    "@types/helmet": "0.0.34",
-    "@types/inversify": "^2.0.31",
-    "@types/jwt-simple": "^0.5.32",
-    "@types/morgan": "^1.7.32",
-    "@types/node": "^7.0.8",
-    "body-parser": "^1.15.2",
-    "concurrently": "^3.1.0",
-    "helmet": "^3.1.0",
+    "@types/body-parser": "1.17.0",
+    "@types/express": "^4.17.0",
+    "@types/glob": "^7.1.1",
+    "@types/helmet": "0.0.43",
+    "@types/inversify": "^2.0.33",
+    "@types/jwt-simple": "^0.5.33",
+    "@types/morgan": "^1.7.36",
+    "@types/node": "^12.7.0",
+    "body-parser": "^1.19.0",
+    "concurrently": "^4.1.1 ",
+    "helmet": "^3.20.0",
     "json-inflector": "^1.1.0",
-    "morgan": "^1.7.0",
-    "nodemon": "^1.11.0",
-    "tslint-eslint-rules": "^3.1.0",
-    "typescript": "^2.2.1",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.19.1",
+    "tslint-eslint-rules": "^5.4.0 ",
+    "typescript": "^3.5.3",
     "validator.ts": "^0.2.2"
   }
 }

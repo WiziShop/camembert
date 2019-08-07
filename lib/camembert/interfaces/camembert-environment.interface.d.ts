@@ -9,7 +9,7 @@ export interface CamembertEnvironment {
      */
     controllersPath: string[];
     /**
-     * Adding a verbose value
+     * If you don't want that Camembert pass more info that's needed
      */
     verbose?: boolean;
 }

@@ -9,4 +9,4 @@ export declare const CamembertFormKey: unique symbol;
  * @returns {(target:Object)=>undefined}
  * @constructor
  */
-export declare function CamembertForm(middleware: (req, res, next, form: Object) => void): (target: Object) => void;
+export declare function CamembertForm(middleware: (req: any, res: any, next: any, form: Object) => void): (target: Object) => void;

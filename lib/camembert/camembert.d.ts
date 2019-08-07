@@ -49,38 +49,38 @@ export declare class Camembert {
     /**
      * Import the controllers to the app
      */
-    private importControllers();
+    private importControllers;
     /**
      * Create the DI container
      *
      */
-    private setContainer();
+    private setContainer;
     /**
      * Set routing
      */
-    private setRouting();
+    private setRouting;
     /**
      * Retrieve all routes for a controller and populate the routes array
      *
      * @param controller
      */
-    private extractRoutesFromCamembertController(controller);
+    private extractRoutesFromCamembertController;
     /**
      * Event listener for HTTP server "error" event
      *
      * @param error
      */
-    private onError(error);
+    private onError;
     /**
      * Event listener for HTTP server "listening" event.
      */
-    private onListening(server);
+    private onListening;
     /**
      * Dump the routes into the console
      *
      * @param app
      */
-    private dumpRoutes(app);
+    private dumpRoutes;
 }
 /**
  * CamembertUtils class
