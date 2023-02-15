@@ -1,0 +1,1 @@
+{"version":3,"file":"camembert-container.js","sourceRoot":"","sources":["../../../src/lib/utils/camembert-container.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,WAAW,CAAC;AAEtC,MAAM,OAAO,kBAAmB,SAAQ,SAAS;CAEhD","sourcesContent":["import { Container } from \"inversify\";\n\nexport class CamembertContainer extends Container {\n\n}\n"]}

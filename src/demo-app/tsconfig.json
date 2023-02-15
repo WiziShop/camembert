@@ -4,16 +4,17 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
-      "es6",
+      "ES2020",
       "dom"
     ],
-    "module": "commonjs",
+    "module": "ES2020",
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": false,
+    "esModuleInterop": true,
     "outDir": "../../dist/demo-app",
     "sourceMap": true,
-    "target": "es6",
+    "target": "ES2020",
     "stripInternal": false,
     "typeRoots": [
       "../../node_modules/@types/!(node)"

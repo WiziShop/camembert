@@ -1,43 +1,32 @@
 import "reflect-metadata";
-import {Container} from "inversify";
-import * as express from "express";
 import * as http from 'http';
 import {
   CamembertInjectable,
   CamembertInjectableMetadataKey
-} from "./decorators/camembert-injectable.decorator";
+} from "./decorators/camembert-injectable.decorator.js";
 
+import {CamembertEnvironment} from "./interfaces/camembert-environment.interface.js";
+import {CamembertControllerMetadataKey, CamembertController} from "./decorators/camembert-controller.decorator.js";
+import {CamembertRouteKey} from "./decorators/camembert-route.decorator.js";
+import {CamembertRouteMiddleware} from "./middlewares/camembert-route.middleware.js";
+import {CamembertFormKey} from "./decorators/camembert-form.decorator.js";
+import express from "express";
+import { CamembertRouteConfig } from "./interfaces/camembert-route-config.interface.js";
+import { CamembertContainer } from "./utils/camembert-container.js";
+import { CamembertUtils } from "./utils/camembert-utils.js";
+import { CamembertRouting } from "./interfaces/camembert-routing.interface.js";
 
-import G = require("glob");
-
-import {CamembertEnvironment} from "./interfaces/camembert-environment.interface";
-import {CamembertControllerMetadataKey, CamembertController} from "./decorators/camembert-controller.decorator";
-import {CamembertRouteConfig, CamembertRouteKey} from "./decorators/camembert-route.decorator";
-import {CamembertRouteMiddleware} from "./middlewares/camembert-route.middleware";
-import {CamembertFormKey} from "./decorators/camembert-form.decorator";
-
-
-export interface CamembertRouting {
-  path: string;
-  httpMethod: string;
-  middleware: Function[];
-}
-
-
-export interface CamembertRouteRouteParameter {
-  name: string;
-  type: any;
-}
-
-export class CamembertContainer extends Container {
-
-}
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const G = require('glob');
 
 /**
  * The Camembert core class
  */
 export class Camembert {
   private started = false;
+
+  private route_imported = false;
 
   private routes: CamembertRouting[] = [];
 
@@ -55,18 +44,19 @@ export class Camembert {
   private constructor(private environment: CamembertEnvironment,
                       run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer)=>void) {
 
-    this.importControllers();
+    this.importControllers().then(() => {
+      this.setContainer();
 
-    this.setContainer();
+      this.setRouting();
 
-    this.setRouting();
+      this.app = express();
 
-    this.app = express();
+      if (run && typeof run === 'function') {
+        run(this.app, this.routes, this.container);
+      }
 
-    if (run && typeof run === 'function') {
-      run(this.app, this.routes, this.container);
-    }
-
+      this.route_imported = true;
+    });
   }
 
   /**
@@ -76,10 +66,17 @@ export class Camembert {
    * @param run Function which will be executed to allow you to configure the app the way you want before start the server
    * @returns {Camembert}
    */
-  static configure(environment: CamembertEnvironment,
-                   run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer)=>void): Camembert {
+  static async configure(environment: CamembertEnvironment,
+                   run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer)=>void): Promise<Camembert> {
+    const camembert = new this(environment, run);
 
-    return new this(environment, run);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        if (camembert.route_imported) {
+          resolve(camembert);
+        }
+      }, 100);
+    });
   }
 
   /**
@@ -93,7 +90,7 @@ export class Camembert {
       throw 'Server already started';
     }
 
-    let server = http.createServer(this.app);
+    const server = http.createServer(this.app);
 
     server.listen(this.environment.port);
 
@@ -121,15 +118,22 @@ export class Camembert {
   /**
    * Import the controllers to the app
    */
-  private importControllers() {
+  private async importControllers() {
 
-    this.environment.controllersPath.forEach(controllerPath => {
-      G.sync(controllerPath).forEach(file => {
-        if (file.split('.').pop() === 'js') {
-          require(file);
-        }
-      })
+    return new Promise((resolve) => {
+      const fileImport = [];
+      this.environment.controllersPath.forEach(controllerPath => {
+        G.sync(controllerPath).forEach(async file => {
+          if (file.split('.').pop() === 'js') {
+            fileImport.push(import(file));
+          }
+        })
+      });
+      Promise.all(fileImport).then(() => {
+        resolve(true);
+      });
     });
+
   }
 
 
@@ -142,7 +146,7 @@ export class Camembert {
 
     this.container.bind(CamembertContainer).toConstantValue(this.container);
 
-    let targets = Reflect.getMetadata(CamembertInjectableMetadataKey, CamembertInjectable);
+    const targets = Reflect.getMetadata(CamembertInjectableMetadataKey, CamembertInjectable);
     targets.forEach(target => {
       this.container.bind(target).toSelf().inSingletonScope();
     });
@@ -152,7 +156,7 @@ export class Camembert {
    * Set routing
    */
   private setRouting() {
-    let controllers = Reflect.getMetadata(CamembertControllerMetadataKey, CamembertController);
+    const controllers = Reflect.getMetadata(CamembertControllerMetadataKey, CamembertController);
 
     controllers.forEach(controller => {
 
@@ -169,14 +173,14 @@ export class Camembert {
   private extractRoutesFromCamembertController(controller: Function) {
 
 
-    for (let actionName of Object.getOwnPropertyNames(controller.prototype)) {
-      let action = controller.prototype[actionName];
+    for (const actionName of Object.getOwnPropertyNames(controller.prototype)) {
+      const action = controller.prototype[actionName];
 
       if (typeof action !== 'function') {
         continue;
       }
 
-      let route: CamembertRouteConfig = Reflect.getMetadata(CamembertRouteKey, action);
+      const route: CamembertRouteConfig = Reflect.getMetadata(CamembertRouteKey, action);
 
       if (!route) {
         continue;
@@ -186,25 +190,25 @@ export class Camembert {
 
       this.routeConfigs.push(route);
 
-      let controllerInstance = this.container.get(route.controller.constructor);
+      const controllerInstance = this.container.get(route.controller.constructor);
 
-      let routeParams = CamembertUtils.getRouteParameters(controllerInstance, route.action);
+      const routeParams = CamembertUtils.getRouteParameters(controllerInstance, route.action);
 
 
-      let middleware: Function[] = route.beforeMiddleware ? route.beforeMiddleware : [];
+      const middleware: Function[] = route.beforeMiddleware ? route.beforeMiddleware : [];
 
-      for (let routerParam of routeParams) {
+      for (const routerParam of routeParams) {
         if (typeof routerParam.type === 'function') {
 
-          let formValidator = Reflect.getMetadata(CamembertFormKey, routerParam.type);
+          const formValidator = Reflect.getMetadata(CamembertFormKey, routerParam.type);
 
           if (formValidator) {
 
             middleware.push((req, res, next) => {
 
-              let formInst = new routerParam.type();
+              const formInst = new routerParam.type();
 
-              for (let property of Object.keys(formInst)) {
+              for (const property of Object.keys(formInst)) {
                 if (req.body.hasOwnProperty(property)) {
                   formInst[property] = req.body[property];
                 }
@@ -246,11 +250,9 @@ export class Camembert {
       case 'EACCES':
         console.error(`Port ${this.environment.port} requires elevated privileges`);
         process.exit(1);
-        break;
       case 'EADDRINUSE':
         console.error(`Port ${this.environment.port} is already in use`);
         process.exit(1);
-        break;
       default:
         throw error;
     }
@@ -261,9 +263,9 @@ export class Camembert {
    */
   private onListening(server: http.Server) {
 
-    let addr = server.address();
+    const addr = server.address();
 
-    let bind = typeof addr === 'string'
+    const bind = typeof addr === 'string'
       ? 'pipe ' + addr
       : 'port ' + addr.port;
 
@@ -277,15 +279,13 @@ export class Camembert {
    * @param app
    */
   private dumpRoutes(app: express.Application) {
-    let ignoredRoutes = ['query', 'expressInit'];
-
     if(this.environment.verbose !== false) {
       console.log(`------ ROUTES ------`);
     }
     app._router.stack.forEach(entry => {
 
       if (entry.route) {
-        let route = entry.route;
+        const route = entry.route;
         Object.keys(route.methods)
           .filter((method) => {
             return !!route.methods[method]
@@ -294,10 +294,10 @@ export class Camembert {
             let r = method.toUpperCase() + ' ' + route.path;
 
             this.routeConfigs.forEach((route: CamembertRouteConfig) => {
-              let paramNames: string[] = [];
-              let controllerInstance = this.container.get(route.controller.constructor);
-              let routeParams = CamembertUtils.getRouteParameters(controllerInstance, route.action);
-              for (let param of routeParams) {
+              const paramNames: string[] = [];
+              const controllerInstance = this.container.get(route.controller.constructor);
+              const routeParams = CamembertUtils.getRouteParameters(controllerInstance, route.action);
+              for (const param of routeParams) {
                 paramNames.push(param.name + ':' + param.type.name);
               }
 
@@ -319,49 +319,4 @@ export class Camembert {
     }
   }
 
-}
-
-
-/**
- * CamembertUtils class
- */
-export class CamembertUtils {
-
-  /**
-   * Retrieve route parameters
-   *
-   * @param ControllerInstance
-   * @param method
-   * @returns {CamembertRouteRouteParameter[]}
-   */
-  static getRouteParameters(ControllerInstance, method): CamembertRouteRouteParameter[] {
-
-    let routeParams: CamembertRouteRouteParameter[] = [];
-
-    let STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-    let ARGUMENT_NAMES = /([^\s,]+)/g;
-
-    function getParamNames(func) {
-      let fnStr = func.toString().replace(STRIP_COMMENTS, '');
-      let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-      if (result === null)
-        result = [];
-      return result;
-    }
-
-    let parameters = getParamNames(method);
-    let parameterTypes = Reflect.getMetadata('design:paramtypes', ControllerInstance, method.name);
-
-    parameters.forEach((parameter, i) => {
-      if (parameterTypes.hasOwnProperty(i)) {
-        routeParams.push({
-          name: parameter,
-          type: parameterTypes[i]
-        });
-      }
-    });
-
-
-    return routeParams;
-  }
 }

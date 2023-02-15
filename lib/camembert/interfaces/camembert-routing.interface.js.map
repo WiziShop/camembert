@@ -1,0 +1,1 @@
+{"version":3,"file":"camembert-routing.interface.js","sourceRoot":"","sources":["../../../src/lib/interfaces/camembert-routing.interface.ts"],"names":[],"mappings":"","sourcesContent":["export interface CamembertRouting {\n  path: string;\n  httpMethod: string;\n  middleware: Function[];\n}\n"]}

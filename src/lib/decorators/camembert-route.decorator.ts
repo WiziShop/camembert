@@ -1,15 +1,7 @@
 import "reflect-metadata";
+import { CamembertRouteConfig } from "../interfaces/camembert-route-config.interface.js";
 
 export const CamembertRouteKey = Symbol('CamembertRouteKey');
-
-export interface CamembertRouteConfig {
-  controller: Object;
-  path: string;
-  httpMethod: string;
-  action: Function;
-  beforeMiddleware: Function[];
-  afterMiddleware: Function[];
-}
 
 /**
  * Camembert route decorator
@@ -24,9 +16,9 @@ export interface CamembertRouteConfig {
  * @constructor
  */
 export function CamembertRoute(httpMethod: string, path?: string, beforeMiddleware?: Array<Function>, afterMiddleware?: Array<Function>) {
-  return function (target: Object, propertyKey: string) {
+  return (target: Object, propertyKey: string) => {
 
-    let route: CamembertRouteConfig = {
+    const route: CamembertRouteConfig = {
       controller: target,
       path: path || '',
       httpMethod: httpMethod.toLocaleLowerCase(),

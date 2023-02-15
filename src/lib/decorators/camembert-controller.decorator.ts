@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import {CamembertInjectable} from "./camembert-injectable.decorator";
+import { CamembertInjectable } from "./camembert-injectable.decorator.js";
 
 export const CamembertControllerMetadataKey = Symbol('CamembertControllerMetadataKey');
 
@@ -11,11 +11,11 @@ export const CamembertControllerMetadataKey = Symbol('CamembertControllerMetadat
  * @constructor
  */
 export function CamembertController(path?: string) {
-  return function (target: Object) {
+  return (target: Object) => {
 
     CamembertInjectable()(target);
 
-    let targets = Reflect.getMetadata(CamembertControllerMetadataKey, CamembertController) || [];
+    const targets = Reflect.getMetadata(CamembertControllerMetadataKey, CamembertController) || [];
 
     targets.push(target);
 

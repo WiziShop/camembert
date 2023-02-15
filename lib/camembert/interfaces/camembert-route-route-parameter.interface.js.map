@@ -1,0 +1,1 @@
+{"version":3,"file":"camembert-route-route-parameter.interface.js","sourceRoot":"","sources":["../../../src/lib/interfaces/camembert-route-route-parameter.interface.ts"],"names":[],"mappings":"","sourcesContent":["export interface CamembertRouteRouteParameter {\n  name: string;\n  type: any;\n}\n"]}

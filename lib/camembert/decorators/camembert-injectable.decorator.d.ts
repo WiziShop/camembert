@@ -7,4 +7,4 @@ export declare const CamembertInjectableMetadataKey: unique symbol;
  * @returns {(target:Object)=>undefined}
  * @constructor
  */
-export declare function CamembertInjectable(): (target: Object) => void;
+export declare function CamembertInjectable(): (target: any) => void;

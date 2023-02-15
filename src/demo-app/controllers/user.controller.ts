@@ -1,8 +1,9 @@
 import * as express from 'express';
 
-import {CamembertController, CamembertRoute} from 'camembert';
-import {Sandwich} from '../services/sandwich';
-import {UserCreateForm} from '../forms/user/user-create.form';
+import { CamembertController } from 'camembert/decorators/camembert-controller.decorator.js';
+import { CamembertRoute } from 'camembert/decorators/camembert-route.decorator.js';
+import { Sandwich } from '../services/sandwich.js';
+import { UserCreateForm } from '../forms/user/user-create.form.js';
 
 
 @CamembertController('/users')

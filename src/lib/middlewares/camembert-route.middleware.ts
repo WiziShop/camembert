@@ -26,9 +26,9 @@
  * @constructor
  */
 export function CamembertRouteMiddleware(controllerInstance, method, routeParams) {
-  return function (req, res, next) {
+  return (req, res, next) => {
 
-    let actionParams: any[] = [];
+    const actionParams: any[] = [];
 
     for (let routerParam of routeParams) {
       if (routerParam.name === 'req') {

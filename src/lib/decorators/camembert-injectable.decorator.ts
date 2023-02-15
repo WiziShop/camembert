@@ -12,11 +12,11 @@ export const CamembertInjectableMetadataKey = Symbol('CamembertInjectable');
  * @constructor
  */
 export function CamembertInjectable() {
-  return function (target: Object) {
+  return (target: any) => {
 
     injectable()(target);
 
-    let targets = Reflect.getMetadata(CamembertInjectableMetadataKey, CamembertInjectable) || [];
+    const targets = Reflect.getMetadata(CamembertInjectableMetadataKey, CamembertInjectable) || [];
 
     targets.push(target);
 

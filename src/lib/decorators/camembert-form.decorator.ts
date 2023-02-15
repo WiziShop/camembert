@@ -13,7 +13,7 @@ export const CamembertFormKey = Symbol('key');
  * @constructor
  */
 export function CamembertForm(middleware: (req, res, next, form: Object)=>void) {
-  return function (target: Object) {
+  return (target: Object) => {
 
     Reflect.defineMetadata(CamembertFormKey, middleware, target);
   }

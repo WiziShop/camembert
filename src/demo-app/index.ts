@@ -1,11 +1,13 @@
-import {environment} from './environment';
+import {environment} from './environment.js';
 import * as express from 'express';
-import {Camembert, CamembertContainer, CamembertRouting} from 'camembert';
-import morgan = require("morgan");
-import helmet = require("helmet");
-import bodyParser = require("body-parser");
-let inflector = require("json-inflector");
+import {Camembert} from 'camembert/camembert.js';
+import {CamembertRouting} from 'camembert/interfaces/camembert-routing.interface.js';
+import {CamembertContainer} from 'camembert/utils/camembert-container.js';
 
+import morgan from 'morgan';
+import helmet from 'helmet';
+import bodyParser from 'body-parser';
+import inflector from 'json-inflector';
 
 Camembert.configure(environment, (app: express.Application, routes: CamembertRouting[], container: CamembertContainer) => {
 
@@ -27,4 +29,7 @@ Camembert.configure(environment, (app: express.Application, routes: CamembertRou
     app[route.httpMethod](route.path, route.middleware);
   });
 
-}).start();
+}).then((app) => {
+  app.start();
+});
+

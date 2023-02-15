@@ -1,26 +1,17 @@
 /// <reference types="node" />
 import "reflect-metadata";
-import { Container } from "inversify";
-import * as express from "express";
 import * as http from 'http';
-import { CamembertEnvironment } from "./interfaces/camembert-environment.interface";
-export interface CamembertRouting {
-    path: string;
-    httpMethod: string;
-    middleware: Function[];
-}
-export interface CamembertRouteRouteParameter {
-    name: string;
-    type: any;
-}
-export declare class CamembertContainer extends Container {
-}
+import { CamembertEnvironment } from "./interfaces/camembert-environment.interface.js";
+import express from "express";
+import { CamembertContainer } from "./utils/camembert-container.js";
+import { CamembertRouting } from "./interfaces/camembert-routing.interface.js";
 /**
  * The Camembert core class
  */
 export declare class Camembert {
     private environment;
     private started;
+    private route_imported;
     private routes;
     private container;
     private app;
@@ -38,7 +29,7 @@ export declare class Camembert {
      * @param run Function which will be executed to allow you to configure the app the way you want before start the server
      * @returns {Camembert}
      */
-    static configure(environment: CamembertEnvironment, run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer) => void): Camembert;
+    static configure(environment: CamembertEnvironment, run?: (app: express.Application, routes: CamembertRouting[], container: CamembertContainer) => void): Promise<Camembert>;
     /**
      * Start the server
      *
@@ -81,17 +72,4 @@ export declare class Camembert {
      * @param app
      */
     private dumpRoutes;
-}
-/**
- * CamembertUtils class
- */
-export declare class CamembertUtils {
-    /**
-     * Retrieve route parameters
-     *
-     * @param ControllerInstance
-     * @param method
-     * @returns {CamembertRouteRouteParameter[]}
-     */
-    static getRouteParameters(ControllerInstance: any, method: any): CamembertRouteRouteParameter[];
 }
