@@ -1,6 +1,6 @@
 
 import * as url from 'url';
-import { CamembertEnvironment } from 'camembert/interfaces/camembert-environment.interface.js';
+import { CamembertEnvironment } from 'camembert';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export const environment: CamembertEnvironment = {

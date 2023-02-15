@@ -1,6 +1,6 @@
 import {IsEmail, NotEmpty} from "validator.ts/decorator/Validation.js";
 import {Validator} from "validator.ts/Validator.js";
-import { CamembertForm } from "camembert/decorators/camembert-form.decorator.js";
+import { CamembertForm } from "camembert";
 
 @CamembertForm((req, res, next, form: UserCreateForm) => {
   let validator = new Validator();

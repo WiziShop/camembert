@@ -1,4 +1,4 @@
-import {CamembertInjectable} from 'camembert/decorators/camembert-injectable.decorator.js';
+import {CamembertInjectable} from 'camembert';
 
 @CamembertInjectable()
 export class Sandwich {

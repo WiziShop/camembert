@@ -1,8 +1,6 @@
 import {environment} from './environment.js';
 import * as express from 'express';
-import {Camembert} from 'camembert/camembert.js';
-import {CamembertRouting} from 'camembert/interfaces/camembert-routing.interface.js';
-import {CamembertContainer} from 'camembert/utils/camembert-container.js';
+import {Camembert, CamembertRouting, CamembertContainer} from 'camembert';
 
 import morgan from 'morgan';
 import helmet from 'helmet';
