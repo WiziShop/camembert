@@ -3,7 +3,7 @@ import {Container} from 'inversify';
 import getDecorators from "inversify-inject-decorators";
 
 
-export const CamembertInjectableMetadataKey = Symbol('CamembertInjectable');
+export const CamembertLazyInjectableMetadataKey = Symbol('CamembertLazyInjectable');
 
 /**
  * Camembert injectable decorator
@@ -19,11 +19,11 @@ export function CamembertLazyInjectable() {
 
     lazyInject(target);
 
-    const targets = Reflect.getMetadata(CamembertInjectableMetadataKey, CamembertLazyInjectable) || [];
+    const targets = Reflect.getMetadata(CamembertLazyInjectableMetadataKey, CamembertLazyInjectable) || [];
 
     targets.push(target);
 
-    Reflect.defineMetadata(CamembertInjectableMetadataKey, targets, CamembertLazyInjectable);
+    Reflect.defineMetadata(CamembertLazyInjectableMetadataKey, targets, CamembertLazyInjectable);
 
   }
 }

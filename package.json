@@ -1,6 +1,6 @@
 {
   "name": "camembert",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "type": "module",
   "description": "A light framwork to create simple backend with express and dependency injection",
   "keywords": [

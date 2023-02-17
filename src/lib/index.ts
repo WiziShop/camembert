@@ -1,6 +1,7 @@
 export * from "./camembert.js";
 export * from "./decorators/camembert-route.decorator.js";
 export * from "./decorators/camembert-injectable.decorator.js";
+export * from "./decorators/camembert-lazy-injectable.decorator.js";
 export * from "./decorators/camembert-controller.decorator.js";
 export * from "./decorators/camembert-form.decorator.js";
 export * from "./interfaces/camembert-environment.interface.js";
