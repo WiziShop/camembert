@@ -1,5 +1,5 @@
 import "reflect-metadata";
-export declare const CamembertInjectableMetadataKey: unique symbol;
+export declare const CamembertLazyInjectableMetadataKey: unique symbol;
 /**
  * Camembert injectable decorator
  *
